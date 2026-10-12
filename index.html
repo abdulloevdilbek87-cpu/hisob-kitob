@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>Do'konlar Qarz va Savdo Boshqaruvi — Pro ERP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M4 4h16v16H4z'/><path fill='%23fff' d='M7 8h10v2H7zm0 4h10v2H7zm0 4h7v2H7z'/></svg>">
+</head>
+<body>
+
+  <!-- ================= TOP ENTERPRISE NAVBAR ================= -->
+  <nav class="pro-navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="brand-badge">💼</div>
+        <div class="brand-info">
+          <h1>
+            QARZLAR VA SAVDO
+            <span class="pro-tag">PRO ERP</span>
+          </h1>
+          <p>O'zaro hisob-kitob va do'konlar daftari</p>
+        </div>
+      </div>
+
+      <div class="nav-tools">
+        <div class="live-clock-badge" id="liveClockDisplay">
+          <span>🕒</span>
+          <span id="liveClockText">Yuklanmoqda...</span>
+        </div>
+
+        <button class="nav-btn theme-btn" id="themeToggleBtn" onclick="ProApp.toggleTheme()" title="Yorug' yoki Qorong'u rejim">
+          <span id="themeToggleIcon">🌙</span>
+          <span id="themeToggleText">Tun</span>
+        </button>
+
+        <button class="nav-btn" onclick="ProCalc.toggle()" title="Kalkulyator (Alt + C)">
+          <span>🧮</span> Kalkulyator
+        </button>
+
+        <button class="nav-btn" onclick="ProApp.openBackupModal()" title="Ma'lumotlar xavfsizligi">
+          <span>💾</span> Zaxira
+        </button>
+
+        <button class="nav-btn nav-btn-primary" onclick="ProApp.openStoreModal()">
+          <span>➕</span> Yangi Do'kon
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= ASOSIY MAZMUN ================= -->
+  <main class="app-content">
+
+    <!-- KPI / XULOSA KO'RSATKICHLARI (Telefon va Kompyuterda moslashuvchan) -->
+    <section class="metrics-row">
+      <!-- 1. Jami Do'konlar -->
+      <div class="metric-card card-stores">
+        <div class="metric-info">
+          <h3>Do'konlar Soni</h3>
+          <div class="metric-value" id="kpiStoreCount">0 ta</div>
+          <div class="metric-sub" id="kpiDebtorCountText">0 ta qarzdor</div>
+        </div>
+        <div class="metric-icon-box">🏬</div>
+      </div>
+
+      <!-- 2. Berilgan Tovar (Chiqim) -->
+      <div class="metric-card card-delivered">
+        <div class="metric-info">
+          <h3>Chiqim (Tovar)</h3>
+          <div class="metric-value num-chiqim" id="kpiDelivered">0 so'm</div>
+          <div class="metric-sub">Yetkazilgan tovarlar</div>
+        </div>
+        <div class="metric-icon-box">📦</div>
+      </div>
+
+      <!-- 3. Olingan Pul (Kirim) -->
+      <div class="metric-card card-paid">
+        <div class="metric-info">
+          <h3>Kirim (To'lov)</h3>
+          <div class="metric-value num-kirim" id="kpiPaid">0 so'm</div>
+          <div class="metric-sub">Kassadagi to'lovlar</div>
+        </div>
+        <div class="metric-icon-box">💵</div>
+      </div>
+
+      <!-- 4. JAMI QOLGAN QARZ -->
+      <div class="metric-card card-debt">
+        <div class="metric-info">
+          <h3>JAMI QOLGAN QARZ</h3>
+          <div class="metric-value" id="kpiDebt">0 so'm</div>
+          <div class="metric-sub" style="color: #b91c1c; font-weight: 700;">Undirilishi kerak</div>
+        </div>
+        <div class="metric-icon-box">⚠️</div>
+      </div>
+    </section>
+
+    <!-- QIDIRUV VA FILTR BOSHQARUVI -->
+    <section class="control-bar">
+      <div class="search-filter-wrapper">
+        <div class="search-input-group">
+          <svg class="search-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" id="filterSearch" placeholder="Do'kon nomi, telefon yoki manzil bo'yicha qidirish..." oninput="ProApp.handleSearch(this.value)">
+        </div>
+
+        <select id="filterStatus" class="custom-select" onchange="ProApp.handleStatusFilter(this.value)">
+          <option value="all">Barcha Do'konlar</option>
+          <option value="debtors">Faqat Qarzdorlar (Qarzi borlar)</option>
+          <option value="clean">Qarzi Yo'qlar (Yopilganlar)</option>
+          <option value="largeDebt">Katta Qarzlar (&gt; 10 mln)</option>
+        </select>
+
+        <select id="filterSort" class="custom-select" onchange="ProApp.handleSort(this.value)">
+          <option value="debt-desc">Saralash: Qarz (Ko'pdan kamga)</option>
+          <option value="debt-asc">Saralash: Qarz (Kamdan ko'pga)</option>
+          <option value="name-asc">Saralash: Nomi (A-Z)</option>
+          <option value="goods-desc">Saralash: Tovar (Katta)</option>
+        </select>
+
+        <!-- Ko'rinish rejimini almashtirish (Mobil uchun) -->
+        <div class="view-mode-toggle">
+          <button class="view-toggle-btn active" id="btnViewCards" onclick="ProApp.switchView('cards')">
+            📱 Karta
+          </button>
+          <button class="view-toggle-btn" id="btnViewTable" onclick="ProApp.switchView('table')">
+            📋 Jadval
+          </button>
+        </div>
+      </div>
+
+      <div class="quick-action-group">
+        <button class="btn-pro btn-pro-primary" onclick="ProApp.openStoreModal()">
+          <span>➕</span> Yangi Do'kon Qo'shish
+        </button>
+      </div>
+    </section>
+
+    <!-- 1. KOMPYUTER JADVAL KO'RINISHI (Table View) -->
+    <div class="table-responsive" id="desktopTableWrapper">
+      <table class="pro-table">
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">№</th>
+            <th>Do'kon Nomi va Manzili</th>
+            <th>Mas'ul Shaxs / Aloqa</th>
+            <th class="text-right">Boshlang'ich Qarz</th>
+            <th class="text-right text-chiqim">Chiqim (Tovar)</th>
+            <th class="text-right text-kirim">Kirim (Pul)</th>
+            <th class="text-right" style="color: var(--danger);">QOLDIQ QARZ</th>
+            <th class="text-center">Holati</th>
+            <th class="text-center action-col" style="width: 240px;">Amallar</th>
+          </tr>
+        </thead>
+        <tbody id="storeTableBody">
+          <!-- JS orqali to'ldiriladi -->
+        </tbody>
+        <tfoot id="storeTableFoot">
+          <!-- Jami hisob JS orqali to'ldiriladi -->
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- 2. TELEFON KARTA KO'RINISHI (Mobile Cards View) -->
+    <div class="mobile-cards-view" id="mobileCardsContainer">
+      <!-- JS orqali to'ldiriladi -->
+    </div>
+
+    <!-- Pastki boshqaruv havolasi -->
+    <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #64748b; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <span>🔒 Ma'lumotlar avtomatik saqlanmoqda. Telefon va kompyuterga to'liq moslashgan.</span>
+      </div>
+      <div>
+        <button onclick="ProApp.confirmClearAll()" style="background: none; border: none; color: #94a3b8; cursor: pointer; text-decoration: underline;">
+          Barcha do'konlarni tozalash
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAL 1: YANGI DO'KON QO'SHISH / TAHRIRLASH ================= -->
+  <div class="modal-overlay" id="modalStore">
+    <div class="modal-container">
+      <div class="modal-header-pro">
+        <h2 id="modalStoreTitle">🏢 Yangi Do'kon Qo'shish</h2>
+        <button class="btn-modal-close" onclick="ProApp.closeModal('modalStore')">✕</button>
+      </div>
+      <form onsubmit="ProApp.handleStoreSubmit(event)">
+        <input type="hidden" id="editStoreId">
+        <div class="modal-body-pro">
+          <div class="form-group-pro">
+            <label>Do'kon Nomi *</label>
+            <input type="text" id="inputStoreName" class="form-control-pro" placeholder="Masalan: Baraka Savdo Markazi" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-pro">
+              <label>Mas'ul Shaxs (Egasi)</label>
+              <input type="text" id="inputContactName" class="form-control-pro" placeholder="Alisher Qodirov">
+            </div>
+            <div class="form-group-pro">
+              <label>Telefon Raqami</label>
+              <input type="tel" id="inputPhone" class="form-control-pro" placeholder="+998 90 123 45 67">
+            </div>
+          </div>
+
+          <div class="form-group-pro">
+            <label>Manzil / Mo'ljal</label>
+            <input type="text" id="inputAddress" class="form-control-pro" placeholder="Chilonzor tumani, 9-mavze">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-pro">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label style="margin-bottom: 0;">Boshlang'ich Qarz (so'm)</label>
+                <button type="button" onclick="ProCalc.open()" class="btn-calc-hint" title="Kalkulyatorda hisoblash">
+                  🧮 Kalkulyator
+                </button>
+              </div>
+              <input type="number" id="inputInitialDebt" class="form-control-pro" placeholder="0" min="0">
+            </div>
+            <div class="form-group-pro">
+              <label>To'lov Muddati</label>
+              <input type="date" id="inputDueDate" class="form-control-pro">
+            </div>
+          </div>
+
+          <div class="form-group-pro">
+            <label>Eslatma / Izoh</label>
+            <textarea id="inputNotes" class="form-control-pro" rows="2" placeholder="Shartlar, hisob-kitob tartibi..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer-pro">
+          <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalStore')">Bekor Qilish</button>
+          <button type="submit" class="btn-pro btn-pro-primary">Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: MOLIYA AMALIYOTI (PUL OLISH / TOVAR BERISH) ================= -->
+  <div class="modal-overlay" id="modalFinance">
+    <div class="modal-container">
+      <div class="modal-header-pro">
+        <h2>💳 Moliya Amaliyoti Kiritish</h2>
+        <button class="btn-modal-close" onclick="ProApp.closeModal('modalFinance')">✕</button>
+      </div>
+      <form onsubmit="ProApp.handleFinanceSubmit(event)">
+        <input type="hidden" id="financeStoreId">
+        <div class="modal-body-pro">
+          <div class="finance-store-banner">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Mijoz do'kon:</div>
+            <div id="financeStoreName" class="store-name">-</div>
+            <div style="font-size: 0.95rem; color: var(--danger); font-weight: 700; margin-top: 4px;">
+              Hozirgi qoldiq qarz: <span id="financeCurrentDebt">0 so'm</span>
+            </div>
+          </div>
+
+          <div class="trans-type-selector">
+            <div class="type-option-card selected-pay" id="cardTypePay" onclick="ProApp.selectTransType('payment')">
+              <div class="type-option-title">🟢 Pul Qabul Qilish (Kirim)</div>
+              <div class="type-option-sub">Qarzidan ayiriladi</div>
+            </div>
+            <div class="type-option-card" id="cardTypeGoods" onclick="ProApp.selectTransType('goods')">
+              <div class="type-option-title">📦 Tovar Yetkazish (Chiqim)</div>
+              <div class="type-option-sub">Qarziga qo'shiladi</div>
+            </div>
+          </div>
+          <input type="hidden" id="financeTransType" value="payment">
+
+          <div class="form-group-pro">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label id="financeAmountLabel" style="margin-bottom: 0; font-weight: 800;">Kirim summasi (so'm) *</label>
+              <button type="button" onclick="ProCalc.open()" class="btn-calc-hint" title="Kalkulyatorda hisoblash">
+                🧮 Kalkulyator
+              </button>
+            </div>
+            <input type="number" id="financeAmount" class="form-control-pro finance-amount-input" placeholder="Masalan: 5000000" min="1" required oninput="ProApp.updateFinanceAmountPreview()">
+            <div class="finance-amount-preview">
+              <span class="preview-badge badge-kirim" id="financePreviewBadge">🟢 Kirim (To'lov)</span>
+              <span class="preview-text" id="financePreviewText">0 so'm</span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-pro">
+              <label>To'lov Turi</label>
+              <select id="financeMethod" class="form-control-pro">
+                <option value="Naqd pul">💵 Naqd pul</option>
+                <option value="Plastik karta">💳 Plastik karta (Terminal)</option>
+                <option value="Bank o'tkazma">🏛️ Bank o'tkazma</option>
+                <option value="Click / Payme">📱 Click / Payme</option>
+              </select>
+            </div>
+            <div class="form-group-pro">
+              <label>Sana</label>
+              <input type="date" id="financeDate" class="form-control-pro">
+            </div>
+          </div>
+
+          <div class="form-group-pro">
+            <label>Hujjat raqami / Izoh</label>
+            <input type="text" id="financeNote" class="form-control-pro" placeholder="Kvitansiya #45, Nakladnoy #120...">
+          </div>
+        </div>
+        <div class="modal-footer-pro">
+          <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalFinance')">Bekor Qilish</button>
+          <button type="submit" class="btn-pro btn-pro-success">Tasdiqlash va Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: AKT-SVERKA (RASMIY HISOB-KITOB VARAQASI) ================= -->
+  <div class="modal-overlay" id="modalStatement">
+    <div class="modal-container" style="max-width: 750px;">
+      <div class="modal-header-pro">
+        <h2>📋 O'zaro Hisob-Kitob Varaqasi</h2>
+        <button class="btn-modal-close" onclick="ProApp.closeModal('modalStatement')">✕</button>
+      </div>
+      <div class="modal-body-pro" id="printableStatementArea">
+        <div class="statement-box">
+          <div class="statement-header-doc">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);" id="statementTitle">Do'kon Nomi</h2>
+              <p style="font-size: 0.85rem; color: var(--text-muted);" id="statementContact">Mas'ul: - | Tel: -</p>
+              <p style="font-size: 0.82rem; color: var(--text-muted);" id="statementAddress">Manzil: -</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Hujjat sanasi:</div>
+              <strong id="statementDatePrint">-</strong>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-secondary); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.88rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; color: var(--text-main);" id="statementSummaryStats">
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="pro-table" style="font-size: 0.85rem; border: 1px solid var(--border-color);">
+              <thead>
+                <tr>
+                  <th style="width: 35px; text-align: center;">№</th>
+                  <th>Sana</th>
+                  <th>Amaliyot</th>
+                  <th>Usuli</th>
+                  <th class="text-right text-chiqim">Chiqim (Tovar)</th>
+                  <th class="text-right text-kirim">Kirim (To'lov)</th>
+                  <th>Izoh</th>
+                </tr>
+              </thead>
+              <tbody id="statementTableBody">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="doc-signatures">
+            <div>
+              <strong>Topshiruvchi:</strong><br><br>
+              Imzo: _______________
+            </div>
+            <div>
+              <strong>Qabul qiluvchi:</strong><br><br>
+              Imzo: _______________
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer-pro">
+        <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalStatement')">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 4: TELEGRAM / SMS ESLATMASI ================= -->
+  <div class="modal-overlay" id="modalSms">
+    <div class="modal-container">
+      <div class="modal-header-pro">
+        <h2>📲 Telegram / SMS Xabari</h2>
+        <button class="btn-modal-close" onclick="ProApp.closeModal('modalSms')">✕</button>
+      </div>
+      <div class="modal-body-pro">
+        <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 0.75rem;">
+          Mijozga yuborish uchun tayyor xabar:
+        </p>
+        <textarea id="smsTextContent" class="form-control-pro" rows="6" readonly style="font-family: inherit; font-size: 0.95rem; line-height: 1.6;"></textarea>
+      </div>
+      <div class="modal-footer-pro">
+        <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalSms')">Yopish</button>
+        <button type="button" class="btn-pro btn-pro-primary" onclick="ProApp.copySmsText()">
+          📋 Nusxalash
+        </button>
+        <button type="button" class="btn-pro btn-pro-success" onclick="ProApp.sendViaTelegram()">
+          ✈️ Telegramda Yuborish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 5: ZAXIRA NUSXA (BACKUP & RESTORE) ================= -->
+  <div class="modal-overlay" id="modalBackup">
+    <div class="modal-container">
+      <div class="modal-header-pro">
+        <h2>💾 Ma'lumotlar Zaxirasi</h2>
+        <button class="btn-modal-close" onclick="ProApp.closeModal('modalBackup')">✕</button>
+      </div>
+      <div class="modal-body-pro">
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1.5px solid #e2e8f0; margin-bottom: 1rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">1. Zaxira nusxa olish</h4>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">
+            Barcha do'konlar va hisoblarni xavfsiz fayl (.json) qilib yuklab oling.
+          </p>
+          <button class="btn-pro btn-pro-primary" style="width: 100%;" onclick="ProApp.downloadBackupFile()">
+            📥 Zaxira Faylini Yuklash (.json)
+          </button>
+        </div>
+
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1.5px solid #e2e8f0;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">2. Zaxira fayldan tiklash</h4>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">
+            Oldin saqlangan faylni yuklab bazani qayta tiklash.
+          </p>
+          <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="ProApp.restoreBackupFile(event)">
+          <button class="btn-pro btn-pro-outline" style="width: 100%;" onclick="document.getElementById('backupFileInput').click()">
+            📤 Zaxira Faylini Tanlash
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer-pro">
+        <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalBackup')">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= KALKULYATOR WIDGETI ================= -->
+  <div class="pro-calc-card" id="proCalcCard" role="dialog" aria-label="Hisob-kitob kalkulyatori">
+    <!-- Header (Surgash / Drag boshqaruvi) -->
+    <div class="calc-header" id="calcDragHeader">
+      <div class="calc-title">
+        <span class="calc-icon">🧮</span>
+        <span>Kalkulyator</span>
+        <span class="calc-pro-badge">PRO</span>
+      </div>
+      <div class="calc-header-actions">
+        <button type="button" class="calc-btn-mini" id="calcHistoryToggleBtn" onclick="ProCalc.toggleHistory()" title="Hisoblar tarixi (Tarix)">
+          📜
+        </button>
+        <button type="button" class="calc-btn-mini" onclick="ProCalc.toggleMinimize()" title="Kichraytirish / Kattalashtirish">
+          ➖
+        </button>
+        <button type="button" class="calc-btn-mini calc-btn-close" onclick="ProCalc.close()" title="Yopish (Esc)">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- History Panel (Oxirgi amallar) -->
+    <div class="calc-history-panel" id="calcHistoryPanel">
+      <div class="calc-history-header">
+        <span>📜 Oxirgi hisoblar</span>
+        <button type="button" class="calc-hist-clear" onclick="ProCalc.clearHistory()">Tozalash</button>
+      </div>
+      <div class="calc-history-list" id="calcHistoryList">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+    </div>
+
+    <!-- Calculator Body -->
+    <div class="calc-body">
+      <!-- Screen Display -->
+      <div class="calc-screen" onclick="ProCalc.copyToClipboard(true)" title="Natijani nusxalash uchun bosing">
+        <div class="calc-screen-formula" id="calcDisplayFormula">&nbsp;</div>
+        <div class="calc-screen-main" id="calcDisplayMain">0</div>
+        <div class="calc-screen-hint">Nusxalash uchun ustiga bosing</div>
+      </div>
+
+      <!-- Keypad Grid -->
+      <div class="calc-keypad">
+        <button type="button" class="calc-key key-clear" onclick="ProCalc.clear()" title="Joriy raqamni tozalash">C</button>
+        <button type="button" class="calc-key key-all-clear" onclick="ProCalc.allClear()" title="Hammasini tozalash">AC</button>
+        <button type="button" class="calc-key key-func" onclick="ProCalc.deleteChar()" title="Bitta raqamni o'chirish">⌫</button>
+        <button type="button" class="calc-key key-op" onclick="ProCalc.setOperation('/')" title="Bo'lish">÷</button>
+
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('7')">7</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('8')">8</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('9')">9</button>
+        <button type="button" class="calc-key key-op" onclick="ProCalc.setOperation('*')" title="Ko'paytirish">×</button>
+
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('4')">4</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('5')">5</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('6')">6</button>
+        <button type="button" class="calc-key key-op" onclick="ProCalc.setOperation('-')" title="Ayirish">−</button>
+
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('1')">1</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('2')">2</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('3')">3</button>
+        <button type="button" class="calc-key key-op" onclick="ProCalc.setOperation('+')" title="Qo'shish">+</button>
+
+        <button type="button" class="calc-key key-func" onclick="ProCalc.toggleSign()" title="Ishorani o'zgartirish">±</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDigit('0')">0</button>
+        <button type="button" class="calc-key key-num key-double-zero" onclick="ProCalc.appendDigit('00')" title="Mingliklar uchun 00">00</button>
+        <button type="button" class="calc-key key-num" onclick="ProCalc.appendDot()">.</button>
+      </div>
+
+      <!-- Bottom Actions -->
+      <div class="calc-bottom-actions">
+        <button type="button" class="calc-key key-percent" onclick="ProCalc.applyPercent()" title="Foiz (Chegirma / Ustama)">%</button>
+        <button type="button" class="calc-key key-equals" onclick="ProCalc.calculate(true)" title="Tenglik (Enter)">=</button>
+      </div>
+
+      <!-- Quick Integration Bar -->
+      <div class="calc-smart-bar">
+        <button type="button" class="calc-smart-btn btn-insert" onclick="ProCalc.insertToForm()" title="Ochiq shaklga summani joylash">
+          📥 Joylash
+        </button>
+        <button type="button" class="calc-smart-btn btn-copy" onclick="ProCalc.copyToClipboard(true)" title="Xotiraga nusxalash">
+          📋 Nusxalash
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= QALQUVCHI (FLOATING) KALKULYATOR TUGMASI ================= -->
+  <button class="floating-calc-btn" id="floatingCalcBtn" onclick="ProCalc.toggle()" title="Kalkulyatorni ochish (Alt+C)">
+    <span class="calc-btn-icon">🧮</span>
+    <span class="calc-btn-text">Kalkulyator</span>
+  </button>
+
+  <!-- Bildirishnoma konteyneri -->
+  <div id="proToast" class="toast-notice"></div>
+
+  <!-- Oflayn SheetJS kutubxonasi -->
+  <script src="js/vendor/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
