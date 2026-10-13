@@ -120,7 +120,7 @@
             <th class="text-right text-kirim">Kirim (Pul)</th>
             <th class="text-right" style="color: var(--danger);">QOLDIQ QARZ</th>
             <th class="text-center">Holati</th>
-            <th class="text-center action-col" style="width: 240px;">Amallar</th>
+            <th class="text-center action-col" style="width: 140px;">Amallar</th>
           </tr>
         </thead>
         <tbody id="storeTableBody">
@@ -208,105 +208,6 @@
           <button type="submit" class="btn-pro btn-pro-primary">Saqlash</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- ================= MODAL: DO'KON VA QARZ TAHLILI (ANALYTICS POP-UP) ================= -->
-  <div class="modal-overlay" id="modalAnalytics">
-    <div class="modal-container" style="max-width: 660px;">
-      <div class="modal-header-pro">
-        <h2 id="analyticsTitle">📊 Qarz va Hisob-Kitob Tahlili</h2>
-        <button class="btn-modal-close" onclick="ProApp.closeModal('modalAnalytics')">✕</button>
-      </div>
-      <div class="modal-body-pro">
-        
-        <!-- Do'kon tafsilotlari -->
-        <div class="analytics-store-card">
-          <div class="analytics-store-name" id="analyticsStoreName">-</div>
-          <div class="analytics-store-meta" id="analyticsStoreMeta">-</div>
-        </div>
-
-        <!-- 4 ta Asosiy Ko'rsatkichlar -->
-        <div class="analytics-metrics-grid">
-          <div class="analytics-metric-card metric-debt">
-            <div class="analytics-metric-label">Hozirgi Qoldiq Qarz</div>
-            <div class="analytics-metric-val" id="analyticsDebtVal">0 so'm</div>
-            <div class="analytics-metric-sub" id="analyticsDebtSub">Undirilishi lozim</div>
-          </div>
-          <div class="analytics-metric-card metric-delivered">
-            <div class="analytics-metric-label">Yetkazilgan Tovar (Chiqim)</div>
-            <div class="analytics-metric-val num-chiqim" id="analyticsDeliveredVal">0 so'm</div>
-            <div class="analytics-metric-sub">Jami berilgan mahsulot</div>
-          </div>
-          <div class="analytics-metric-card metric-paid">
-            <div class="analytics-metric-label">Qabul Qilingan Pul (Kirim)</div>
-            <div class="analytics-metric-val num-kirim" id="analyticsPaidVal">0 so'm</div>
-            <div class="analytics-metric-sub">Kassadagi to'lovlar</div>
-          </div>
-          <div class="analytics-metric-card metric-initial">
-            <div class="analytics-metric-label">Boshlang'ich Qarz</div>
-            <div class="analytics-metric-val" id="analyticsInitialVal">0 so'm</div>
-            <div class="analytics-metric-sub">Eski hisobdan qoldiq</div>
-          </div>
-        </div>
-
-        <!-- Qarz Intizomi & Progress -->
-        <div class="analytics-health-card">
-          <div class="analytics-section-title">⚖️ Qarz To'lov Intizomi</div>
-          
-          <div class="analytics-progress-wrapper">
-            <div class="analytics-progress-header">
-              <span>To'lov qoplanganligi:</span>
-              <span class="analytics-progress-pct" id="analyticsPaymentPct">0%</span>
-            </div>
-            <div class="analytics-progress-track">
-              <div class="analytics-progress-bar" id="analyticsProgressBar" style="width: 0%;"></div>
-            </div>
-            <div class="analytics-progress-caption" id="analyticsProgressCaption">-</div>
-          </div>
-
-          <div class="analytics-tags-row">
-            <div class="analytics-tag" id="analyticsRiskTag">Holat tahlili</div>
-            <div class="analytics-tag" id="analyticsDueTag">Muddat</div>
-            <div class="analytics-tag" id="analyticsTxCountTag">Operatsiyalar</div>
-          </div>
-        </div>
-
-        <!-- So'nggi Harakatlar Dinamikasi -->
-        <div class="analytics-activity-card">
-          <div class="analytics-section-title">⏱️ So'nggi Harakatlar va Dinamika</div>
-          <div class="analytics-activity-grid">
-            <div class="activity-box">
-              <div class="activity-label">Oxirgi qabul qilingan to'lov:</div>
-              <div class="activity-val text-kirim" id="analyticsLastPayment">-</div>
-            </div>
-            <div class="activity-box">
-              <div class="activity-label">Oxirgi yetkazilgan tovar:</div>
-              <div class="activity-val text-chiqim" id="analyticsLastDelivery">-</div>
-            </div>
-          </div>
-          <div class="analytics-notes-box" id="analyticsNotesBox" style="display: none;">
-            <strong>📝 Eslatma:</strong> <span id="analyticsNotesText"></span>
-          </div>
-        </div>
-
-        <!-- Tezkor Harakatlar -->
-        <div class="analytics-quick-actions">
-          <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.openStatementFromAnalytics()" title="Rasmiy akt-sverkani ko'rish">
-            📋 Akt-Sverka
-          </button>
-          <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.openSmsFromAnalytics()" title="Telegram yoki SMS xabari yuborish">
-            📲 SMS / Telegram
-          </button>
-          <button type="button" class="btn-pro btn-pro-primary" onclick="ProApp.openFinanceFromAnalytics()" title="Pul olish yoki tovar yetkazish">
-            💳 Moliya Kiritish
-          </button>
-        </div>
-
-      </div>
-      <div class="modal-footer-pro">
-        <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalAnalytics')">Yopish</button>
-      </div>
     </div>
   </div>
 

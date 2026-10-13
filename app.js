@@ -310,23 +310,14 @@ const ProApp = {
 
         <td class="text-center">
           ${c.remainingDebt > 0 
-            ? `<button type="button" class="status-pill status-has-debt" onclick="ProApp.openDebtAnalytics(${store.id})" title="Qarz tahlili va diagnostikasini ko'rish">🔴 Qarzdor</button>` 
-            : `<button type="button" class="status-pill status-clean" onclick="ProApp.openDebtAnalytics(${store.id})" title="Hisob tahlilini ko'rish">🟢 To'langan</button>`}
+            ? `<span class="status-pill status-has-debt">🔴 Qarzdor</span>` 
+            : `<span class="status-pill status-clean">🟢 To'langan</span>`}
         </td>
 
         <td class="text-center action-col">
           <div class="action-btn-group">
             <button class="btn-table-action btn-action-finance" onclick="ProApp.openFinanceModal(${store.id})" title="Pul qabul qilish yoki tovar berish">
               💳 Moliya
-            </button>
-            <button class="btn-table-action" onclick="ProApp.openStatementModal(${store.id})" title="Akt-sverka">
-              📋 Hujjat
-            </button>
-            <button class="btn-table-action btn-action-sms" onclick="ProApp.openSmsModal(${store.id})" title="Telegram / SMS xabari">
-              📲 SMS
-            </button>
-            <button class="btn-table-action" onclick="ProApp.editStore(${store.id})" title="Tahrirlash">
-              ✏️
             </button>
             <button class="btn-table-action btn-action-del" onclick="ProApp.deleteStore(${store.id})" title="O'chirish">
               ✕
@@ -392,8 +383,8 @@ const ProApp = {
           </div>
           <div>
             ${c.remainingDebt > 0 
-              ? `<button type="button" class="status-pill status-has-debt" onclick="ProApp.openDebtAnalytics(${store.id})" title="Qarz tahlili va diagnostikasini ko'rish">🔴 Qarzdor</button>` 
-              : `<button type="button" class="status-pill status-clean" onclick="ProApp.openDebtAnalytics(${store.id})" title="Hisob tahlilini ko'rish">🟢 To'langan</button>`}
+              ? `<span class="status-pill status-has-debt">🔴 Qarzdor</span>` 
+              : `<span class="status-pill status-clean">🟢 To'langan</span>`}
           </div>
         </div>
 
@@ -420,15 +411,6 @@ const ProApp = {
         <div class="card-m-actions">
           <button class="card-m-btn card-m-btn-pay" onclick="ProApp.openFinanceModal(${store.id})">
             💳 Moliya
-          </button>
-          <button class="card-m-btn" onclick="ProApp.openStatementModal(${store.id})">
-            📋 Hujjat
-          </button>
-          <button class="card-m-btn card-m-btn-sms" onclick="ProApp.openSmsModal(${store.id})">
-            📲 SMS
-          </button>
-          <button class="card-m-btn" onclick="ProApp.editStore(${store.id})" title="Tahrirlash">
-            ✏️
           </button>
           <button class="card-m-btn card-m-btn-del" onclick="ProApp.deleteStore(${store.id})" title="O'chirish">
             ✕
@@ -676,143 +658,6 @@ const ProApp = {
     this.saveData();
     this.render();
     this.closeModal('modalFinance');
-  },
-
-  // 7.5. Do'kon va Qarz Tahlili Pop-up oynasi (Analytics)
-  openDebtAnalytics(storeId) {
-    const store = this.stores.find(s => s.id === storeId);
-    if (!store) return;
-
-    this.activeStoreId = storeId;
-    const c = this.calculateStore(store);
-    const cleanPhone = store.phone ? store.phone.replace(/[^0-9+]/g, '') : '';
-
-    // Sarlavha va do'kon ma'lumotlari
-    document.getElementById('analyticsTitle').innerHTML = `📊 "${store.name}" — Qarz Tahlili`;
-    document.getElementById('analyticsStoreName').textContent = store.name;
-    
-    let metaHtml = '';
-    if (store.contact) metaHtml += `<span>👤 Mas'ul: <strong>${store.contact}</strong></span>`;
-    if (store.phone) metaHtml += `<span>📞 <a href="tel:${cleanPhone}" style="color: inherit; text-decoration: underline;">${store.phone}</a></span>`;
-    if (store.address) metaHtml += `<span>📍 Manzil: ${store.address}</span>`;
-    document.getElementById('analyticsStoreMeta').innerHTML = metaHtml || "<span>Ma'lumotlar kiritilmagan</span>";
-
-    // 4 ta Asosiy ko'rsatkichlar
-    document.getElementById('analyticsDebtVal').textContent = this.formatMoney(c.remainingDebt);
-    document.getElementById('analyticsDebtSub').textContent = c.remainingDebt > 0 ? "Undirilishi lozim bo'lgan qarz" : "Qarz to'liq yopilgan";
-    document.getElementById('analyticsDeliveredVal').textContent = "+ " + this.formatMoney(c.deliveredGoods);
-    document.getElementById('analyticsPaidVal').textContent = "- " + this.formatMoney(c.paidAmount);
-    document.getElementById('analyticsInitialVal').textContent = this.formatMoney(c.initialDebt);
-
-    // Qaytarish foizi (To'lov qoplanganligi)
-    const totalLiab = c.totalLiability; // initialDebt + deliveredGoods
-    let pct = 100;
-    if (totalLiab > 0) {
-      pct = Math.min(100, Math.round((c.paidAmount / totalLiab) * 100));
-    } else if (c.remainingDebt === 0) {
-      pct = 100;
-    }
-    
-    document.getElementById('analyticsPaymentPct').textContent = `${pct}%`;
-    const bar = document.getElementById('analyticsProgressBar');
-    bar.style.width = `${pct}%`;
-    if (pct >= 80) {
-      bar.style.backgroundColor = 'var(--success)';
-    } else if (pct >= 40) {
-      bar.style.backgroundColor = 'var(--warning)';
-    } else {
-      bar.style.backgroundColor = 'var(--danger)';
-    }
-
-    document.getElementById('analyticsProgressCaption').textContent = 
-      totalLiab > 0 
-        ? `Jami ${this.formatMoney(totalLiab)} majburiyatdan ${this.formatMoney(c.paidAmount)} (${pct}%) to'langan.`
-        : "Majburiyatlar mavjud emas.";
-
-    // Teglar: Qarz holati xavfi
-    const riskTag = document.getElementById('analyticsRiskTag');
-    if (c.remainingDebt <= 0) {
-      riskTag.className = 'analytics-tag tag-success';
-      riskTag.innerHTML = '🟢 Qarz yo\'q (To\'langan)';
-    } else if (c.remainingDebt >= 10000000) {
-      riskTag.className = 'analytics-tag tag-danger';
-      riskTag.innerHTML = '🚨 Yuqori xavf (Katta qarz > 10 mln)';
-    } else if (c.remainingDebt >= 3000000) {
-      riskTag.className = 'analytics-tag tag-warning';
-      riskTag.innerHTML = '⚠️ O\'rta darajadagi qarz';
-    } else {
-      riskTag.className = 'analytics-tag tag-info';
-      riskTag.innerHTML = 'ℹ️ Kichik qoldiq qarz';
-    }
-
-    // To'lov muddati (Dedlayn) tegi
-    const dueTag = document.getElementById('analyticsDueTag');
-    if (store.dueDate) {
-      const todayDate = new Date();
-      todayDate.setHours(0,0,0,0);
-      const dueDateObj = new Date(store.dueDate);
-      dueDateObj.setHours(0,0,0,0);
-      const diffDays = Math.round((dueDateObj - todayDate) / (1000 * 60 * 60 * 24));
-
-      if (diffDays < 0 && c.remainingDebt > 0) {
-        dueTag.className = 'analytics-tag tag-danger';
-        dueTag.innerHTML = `⏳ Muddat o'tgan: ${store.dueDate} (${Math.abs(diffDays)} kun kechikdi)`;
-      } else if (diffDays === 0 && c.remainingDebt > 0) {
-        dueTag.className = 'analytics-tag tag-warning';
-        dueTag.innerHTML = `⚠️ To'lov muddati bugun: ${store.dueDate}`;
-      } else {
-        dueTag.className = 'analytics-tag tag-info';
-        dueTag.innerHTML = `📅 Muddat: ${store.dueDate} (${diffDays > 0 ? diffDays + ' kun qoldi' : 'yetib kelgan'})`;
-      }
-      dueTag.style.display = 'inline-flex';
-    } else {
-      dueTag.style.display = 'none';
-    }
-
-    // Amaliyotlar soni
-    const history = store.history || [];
-    document.getElementById('analyticsTxCountTag').innerHTML = `🔄 Jami ${history.length} ta operatsiya`;
-
-    // So'nggi amaliyotlar tahlili
-    const lastPayment = [...history].reverse().find(h => (h.paid && h.paid > 0) || h.type === 'Pul qabul qilindi');
-    const lastDelivery = [...history].reverse().find(h => (h.delivered && h.delivered > 0) || h.type === 'Tovar yetkazildi');
-
-    document.getElementById('analyticsLastPayment').textContent = lastPayment 
-      ? `${lastPayment.date} — ${this.formatMoney(lastPayment.paid || 0)} (${lastPayment.method || 'Naqd'})` 
-      : "To'lov hali qayd etilmagan";
-
-    document.getElementById('analyticsLastDelivery').textContent = lastDelivery 
-      ? `${lastDelivery.date} — ${this.formatMoney(lastDelivery.delivered || 0)}` 
-      : "Yangi tovar yetkazilmagan";
-
-    // Eslatma bloki
-    const notesBox = document.getElementById('analyticsNotesBox');
-    if (store.notes && store.notes.trim()) {
-      notesBox.style.display = 'block';
-      document.getElementById('analyticsNotesText').textContent = store.notes;
-    } else {
-      notesBox.style.display = 'none';
-    }
-
-    document.getElementById('modalAnalytics').classList.add('active');
-  },
-
-  openFinanceFromAnalytics() {
-    const id = this.activeStoreId;
-    this.closeModal('modalAnalytics');
-    if (id) this.openFinanceModal(id);
-  },
-
-  openSmsFromAnalytics() {
-    const id = this.activeStoreId;
-    this.closeModal('modalAnalytics');
-    if (id) this.openSmsModal(id);
-  },
-
-  openStatementFromAnalytics() {
-    const id = this.activeStoreId;
-    this.closeModal('modalAnalytics');
-    if (id) this.openStatementModal(id);
   },
 
   // 8. Rasmiy Akt-Sverka (O'zaro Hisob-kitob Varaqasi)
