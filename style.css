@@ -80,7 +80,14 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+
+/* Faqat rejim almashtirilganda silliq o'tish, yuklanganda miltillashning oldini oladi */
+.theme-animating,
+.theme-animating *,
+.theme-animating *::before,
+.theme-animating *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease !important;
 }
 
 html {

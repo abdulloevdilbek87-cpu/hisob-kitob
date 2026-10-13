@@ -58,8 +58,12 @@ const ProApp = {
   },
 
   toggleTheme() {
+    document.documentElement.classList.add('theme-animating');
     const next = this.currentTheme === 'dark' ? 'light' : 'dark';
     this.setTheme(next, true);
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-animating');
+    }, 300);
   },
 
   // 1. Jonli soat va sana

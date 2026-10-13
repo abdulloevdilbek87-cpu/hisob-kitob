@@ -2,6 +2,16 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('pro_erp_theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="theme-color" content="#0f172a">
   <title>Do'konlar Qarz va Savdo Boshqaruvi — Pro ERP</title>
@@ -24,6 +34,15 @@
             <button class="theme-round-btn" id="themeToggleBtn" onclick="ProApp.toggleTheme()" title="Rejimni almashtirish (Tun / Kun)" aria-label="Rejimni almashtirish">
               <span id="themeToggleIcon">🌙</span>
             </button>
+            <script>
+              (function() {
+                try {
+                  var t = document.documentElement.getAttribute('data-theme');
+                  var ic = document.getElementById('themeToggleIcon');
+                  if (ic && t === 'dark') ic.textContent = '☀️';
+                } catch (e) {}
+              })();
+            </script>
           </h1>
           <p>O'zaro hisob-kitob va do'konlar daftari</p>
         </div>
