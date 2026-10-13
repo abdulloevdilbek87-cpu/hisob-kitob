@@ -163,6 +163,53 @@ body {
   font-weight: 700;
 }
 
+/* Dumaloq Kun / Tun tugmasi (Qarzlar va Savdo sarlavhasi yonida) */
+.theme-round-btn {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0;
+  vertical-align: middle;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  margin-left: 0.35rem;
+}
+
+.theme-round-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.65);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-round-btn:active {
+  transform: scale(0.92);
+}
+
+[data-theme="dark"] .theme-round-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .theme-round-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
 .brand-info p {
   font-size: 0.8rem;
   color: var(--text-soft);
@@ -875,6 +922,16 @@ body {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color);
+  margin: auto;
+}
+
+/* Modal ichidagi shakllar sig'maganda pastga siljishi (scroll) uchun */
+.modal-container form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 @keyframes modalScale {
@@ -920,6 +977,12 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.modal-body-pro > *:last-child {
+  margin-bottom: 0.5rem;
 }
 
 .form-group-pro {
@@ -949,6 +1012,13 @@ body {
 .form-control-pro:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+textarea.form-control-pro {
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 .form-grid-2 {
@@ -1259,18 +1329,39 @@ body {
 
   .modal-overlay {
     padding: 0.5rem;
+    overflow-y: auto;
   }
 
   .modal-container {
-    max-height: 94vh;
+    max-height: 92vh;
+    height: auto;
   }
 
-  .modal-header-pro, .modal-body-pro, .modal-footer-pro {
+  .modal-container form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .modal-header-pro {
+    padding: 0.85rem 1rem;
+    flex-shrink: 0;
+  }
+
+  .modal-body-pro {
     padding: 1rem;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modal-footer-pro {
+    padding: 0.85rem 1rem;
     flex-direction: column-reverse;
+    flex-shrink: 0;
   }
 
   .modal-footer-pro button {

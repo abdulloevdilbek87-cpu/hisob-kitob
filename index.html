@@ -21,7 +21,9 @@
         <div class="brand-info">
           <h1>
             QARZLAR VA SAVDO
-            <span class="pro-tag">PRO ERP</span>
+            <button class="theme-round-btn" id="themeToggleBtn" onclick="ProApp.toggleTheme()" title="Rejimni almashtirish (Tun / Kun)" aria-label="Rejimni almashtirish">
+              <span id="themeToggleIcon">🌙</span>
+            </button>
           </h1>
           <p>O'zaro hisob-kitob va do'konlar daftari</p>
         </div>
@@ -32,11 +34,6 @@
           <span>🕒</span>
           <span id="liveClockText">Yuklanmoqda...</span>
         </div>
-
-        <button class="nav-btn theme-btn" id="themeToggleBtn" onclick="ProApp.toggleTheme()" title="Yorug' yoki Qorong'u rejim">
-          <span id="themeToggleIcon">🌙</span>
-          <span id="themeToggleText">Tun</span>
-        </button>
 
         <button class="nav-btn" onclick="ProCalc.toggle()" title="Kalkulyator (Alt + C)">
           <span>🧮</span> Kalkulyator
@@ -56,48 +53,6 @@
   <!-- ================= ASOSIY MAZMUN ================= -->
   <main class="app-content">
 
-    <!-- KPI / XULOSA KO'RSATKICHLARI (Telefon va Kompyuterda moslashuvchan) -->
-    <section class="metrics-row">
-      <!-- 1. Jami Do'konlar -->
-      <div class="metric-card card-stores">
-        <div class="metric-info">
-          <h3>Do'konlar Soni</h3>
-          <div class="metric-value" id="kpiStoreCount">0 ta</div>
-          <div class="metric-sub" id="kpiDebtorCountText">0 ta qarzdor</div>
-        </div>
-        <div class="metric-icon-box">🏬</div>
-      </div>
-
-      <!-- 2. Berilgan Tovar (Chiqim) -->
-      <div class="metric-card card-delivered">
-        <div class="metric-info">
-          <h3>Chiqim (Tovar)</h3>
-          <div class="metric-value num-chiqim" id="kpiDelivered">0 so'm</div>
-          <div class="metric-sub">Yetkazilgan tovarlar</div>
-        </div>
-        <div class="metric-icon-box">📦</div>
-      </div>
-
-      <!-- 3. Olingan Pul (Kirim) -->
-      <div class="metric-card card-paid">
-        <div class="metric-info">
-          <h3>Kirim (To'lov)</h3>
-          <div class="metric-value num-kirim" id="kpiPaid">0 so'm</div>
-          <div class="metric-sub">Kassadagi to'lovlar</div>
-        </div>
-        <div class="metric-icon-box">💵</div>
-      </div>
-
-      <!-- 4. JAMI QOLGAN QARZ -->
-      <div class="metric-card card-debt">
-        <div class="metric-info">
-          <h3>JAMI QOLGAN QARZ</h3>
-          <div class="metric-value" id="kpiDebt">0 so'm</div>
-          <div class="metric-sub" style="color: #b91c1c; font-weight: 700;">Undirilishi kerak</div>
-        </div>
-        <div class="metric-icon-box">⚠️</div>
-      </div>
-    </section>
 
     <!-- QIDIRUV VA FILTR BOSHQARUVI -->
     <section class="control-bar">

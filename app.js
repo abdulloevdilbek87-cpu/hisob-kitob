@@ -39,13 +39,16 @@ const ProApp = {
 
     const icon = document.getElementById('themeToggleIcon');
     const text = document.getElementById('themeToggleText');
-    if (icon && text) {
+    const btn = document.getElementById('themeToggleBtn');
+    if (icon) {
       if (theme === 'dark') {
         icon.textContent = '☀️';
-        text.textContent = 'Kun';
+        if (text) text.textContent = 'Kun';
+        if (btn) btn.title = "Yorug' rejimga o'tish (Kun)";
       } else {
         icon.textContent = '🌙';
-        text.textContent = 'Tun';
+        if (text) text.textContent = 'Tun';
+        if (btn) btn.title = "Qorong'u rejimga o'tish (Tun)";
       }
     }
 
@@ -204,6 +207,9 @@ const ProApp = {
   },
 
   renderKPIs() {
+    const elStoreCount = document.getElementById('kpiStoreCount');
+    if (!elStoreCount) return;
+
     let sumDelivered = 0;
     let sumPaid = 0;
     let sumDebt = 0;
@@ -217,11 +223,15 @@ const ProApp = {
       if (c.remainingDebt > 0) debtorCount++;
     });
 
-    document.getElementById('kpiStoreCount').textContent = this.stores.length + " ta";
-    document.getElementById('kpiDebtorCountText').textContent = `${debtorCount} ta qarzdor`;
-    document.getElementById('kpiDelivered').textContent = this.formatMoney(sumDelivered);
-    document.getElementById('kpiPaid').textContent = this.formatMoney(sumPaid);
-    document.getElementById('kpiDebt').textContent = this.formatMoney(sumDebt);
+    elStoreCount.textContent = this.stores.length + " ta";
+    const elDebtorCount = document.getElementById('kpiDebtorCountText');
+    if (elDebtorCount) elDebtorCount.textContent = `${debtorCount} ta qarzdor`;
+    const elDelivered = document.getElementById('kpiDelivered');
+    if (elDelivered) elDelivered.textContent = this.formatMoney(sumDelivered);
+    const elPaid = document.getElementById('kpiPaid');
+    if (elPaid) elPaid.textContent = this.formatMoney(sumPaid);
+    const elDebt = document.getElementById('kpiDebt');
+    if (elDebt) elDebt.textContent = this.formatMoney(sumDebt);
   },
 
   // Kompyuter Jadvalini Render Qilish
