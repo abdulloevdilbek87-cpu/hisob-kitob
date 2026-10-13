@@ -101,9 +101,6 @@
       </div>
 
       <div class="quick-action-group">
-        <button class="btn-pro btn-pro-outline" onclick="ProApp.openGeneralDebtorsAnalysis()" title="Umumiy qarzdorlar tahlili pop-up oynasini ochish">
-          <span>📊</span> Qarzdorlar Tahlili
-        </button>
         <button class="btn-pro btn-pro-primary" onclick="ProApp.openStoreModal()">
           <span>➕</span> Yangi Do'kon Qo'shish
         </button>
@@ -407,27 +404,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: QARZ TAHLILI (POPOUP) ================= -->
-  <div class="modal-overlay" id="modalDebtAnalysis">
-    <div class="modal-container" style="max-width: 640px;">
-      <div class="modal-header-pro">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <span style="font-size: 1.35rem;">📊</span>
-          <div>
-            <h2 id="analysisStoreName" style="font-size: 1.15rem; margin-bottom: 2px;">Qarz Tahlili</h2>
-            <div id="analysisStoreSubtitle" style="font-size: 0.8rem; color: var(--text-muted);">Moliyaviy ko'rsatkichlar va xulosa</div>
-          </div>
-        </div>
-        <button class="btn-modal-close" onclick="ProApp.closeModal('modalDebtAnalysis')">✕</button>
-      </div>
-      <div class="modal-body-pro" id="debtAnalysisContent">
-        <!-- Dinamik ravishda yuklanadi -->
-      </div>
-      <div class="modal-footer-pro">
-        <button type="button" class="btn-pro btn-pro-outline" onclick="ProApp.closeModal('modalDebtAnalysis')">Yopish</button>
-      </div>
-    </div>
-  </div>
 
   <!-- ================= KALKULYATOR WIDGETI ================= -->
   <div class="pro-calc-card" id="proCalcCard" role="dialog" aria-label="Hisob-kitob kalkulyatori">
